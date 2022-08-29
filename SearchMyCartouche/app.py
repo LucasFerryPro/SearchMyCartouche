@@ -14,6 +14,7 @@ app.config['SESSION_TYPE'] = 'filesystem'
 
 listeFinal = []
 keys=[]
+pwd = 'InkBI123emPT'
 
 
 def allowed_file(filename):
@@ -35,8 +36,15 @@ def dataSorter(xls):
     return listeFinal, list(listeFinal[0].keys())
 
 @app.route('/', methods=['GET','POST'])
+def password():
+    if request.method == 'POST':
+        if request.form.get('password') == pwd:
+           home()
+    return render_template('password.html')
+
+@app.route('/home', methods=['GET','POST'])
 def home():
-    # try:
+    try:
         find = []
         filename = glob.glob('static/excel/*')[0][13:]
         listeFinal = dataSorter(ExcelFile(os.path.join(app.config['UPLOAD_FOLDER'], filename)))[0]
@@ -46,8 +54,8 @@ def home():
                 if request.form.get("texte") in element[keys[1]]:
                     find.append(listeFinal.index(element))
         return render_template('home.html', listeFinal=listeFinal, keys=keys, find=find)
-    # except:
-    #     return redirect(url_for('upload_file'))
+    except:
+        return redirect(url_for('upload_file'))
 
 
 

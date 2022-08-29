@@ -37,8 +37,10 @@ def dataSorter(xls):
 
 @app.route('/', methods=['GET','POST'])
 def password():
+    text=''
     if request.method == 'POST':
         if request.form.get('password') == pwd:
+            text = ''
             try:
                 find = []
                 filename = glob.glob('static/excel/*')[0][13:]
@@ -51,7 +53,9 @@ def password():
                 return render_template('home.html', listeFinal=listeFinal, keys=keys, find=find)
             except:
                 return redirect(url_for('upload_file'))
-    return render_template('password.html')
+        else:
+            text = 'nul'
+    return render_template('password.html',text=text)
 
 @app.route('/home', methods=['GET','POST'])
 def home():

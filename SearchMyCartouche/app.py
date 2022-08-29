@@ -40,8 +40,9 @@ def password():
     text=''
     if request.method == 'POST':
         if request.form.get('password') == pwd:
-            text = ''
+            text = 'passed1'
             try:
+                text = 'passed2'
                 find = []
                 filename = glob.glob('static/excel/*')[0][13:]
                 listeFinal = dataSorter(ExcelFile(os.path.join(app.config['UPLOAD_FOLDER'], filename)))[0]

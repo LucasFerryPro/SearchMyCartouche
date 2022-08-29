@@ -37,12 +37,9 @@ def dataSorter(xls):
 
 @app.route('/', methods=['GET','POST'])
 def password():
-    text=''
     if request.method == 'POST':
         if request.form.get('password') == pwd:
-            text = 'passed1'
             try:
-                text = 'passed2'
                 find = []
                 filename = glob.glob('static/excel/*')[0][13:]
                 listeFinal = dataSorter(ExcelFile(os.path.join(app.config['UPLOAD_FOLDER'], filename)))[0]
@@ -54,9 +51,7 @@ def password():
                 return render_template('home.html', listeFinal=listeFinal, keys=keys, find=find)
             except:
                 return redirect(url_for('upload_file'))
-        else:
-            text = 'nul'
-    return render_template('password.html',text=text)
+    return render_template('password.html')
 
 @app.route('/home', methods=['GET','POST'])
 def home():

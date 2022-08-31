@@ -66,6 +66,10 @@ def home():
             for element in listeFinal:
                 if request.form.get("texte") in element[keys[1]]:
                     find.append(listeFinal.index(element))
+            for index in find:
+                inter = listeFinal[index]
+                del listeFinal[index]
+                listeFinal.insert(0,inter)
         return render_template('home.html', listeFinal=listeFinal, keys=keys, find=find)
     except:
         return redirect(url_for('upload_file'))

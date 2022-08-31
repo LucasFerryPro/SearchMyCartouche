@@ -4,7 +4,7 @@ from pandas import *
 from flask import Flask, flash, request, redirect, url_for, render_template
 from werkzeug.utils import secure_filename
 
-UPLOAD_FOLDER = 'static/excel'
+UPLOAD_FOLDER = '/home/SearchMyCartouche/SearchMyCartouche/static/excel/'
 ALLOWED_EXTENSIONS = {'xls', 'xlsx'}
 
 app = Flask(__name__)
@@ -16,6 +16,8 @@ listeFinal = []
 keys=[]
 pwd = 'InkBI123emPT'
 
+canHome = False
+canUpload = False
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -27,7 +29,7 @@ def dataSorter(xls):
     listeFinal = []
     listeInter = {}
 
-    for i in range(2, len(liste[0]) - 1):
+    for i in range(2, len(liste[0])):
         for j in range(len(liste)):
             listeInter[liste[j][1]] = liste[j][i]
         listeFinal.append(listeInter)
@@ -37,22 +39,27 @@ def dataSorter(xls):
 
 @app.route('/', methods=['GET','POST'])
 def password():
+    global canHome
+    global canUpload
+    canHome = False
+    canUpload = False
     if request.method == 'POST':
         if request.form.get('password') == pwd:
+            canHome = True
+            canUpload = True
             try:
-                filename = glob.glob('static/excel/*')[0][13:]
-                listeFinal = dataSorter(ExcelFile(os.path.join(app.config['UPLOAD_FOLDER'], filename)))[0]
-                keys = dataSorter(ExcelFile(os.path.join(app.config['UPLOAD_FOLDER'], filename)))[1]
-                return redirect(url_for('home', listeFinal=listeFinal, keys=keys, find=[]))
+                return redirect(url_for('home'))
             except:
                 return redirect(url_for('upload_file'))
     return render_template('password.html')
 
 @app.route('/home', methods=['GET','POST'])
 def home():
+    if not canHome:
+        return redirect(url_for('password'))
     try:
         find = []
-        filename = glob.glob('static/excel/*')[0][13:]
+        filename = glob.glob('/home/SearchMyCartouche/SearchMyCartouche/static/excel/*')[0][55:]
         listeFinal = dataSorter(ExcelFile(os.path.join(app.config['UPLOAD_FOLDER'], filename)))[0]
         keys = dataSorter(ExcelFile(os.path.join(app.config['UPLOAD_FOLDER'], filename)))[1]
         if request.method == 'POST':
@@ -67,6 +74,8 @@ def home():
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
+    if not canUpload:
+        return redirect(url_for('password'))
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -77,27 +86,15 @@ def upload_file():
         # empty file without a filename.
         if file.filename == '':
             try:
-                filename = glob.glob('static/excel/*')[0][13:]
-                listeFinal = dataSorter(ExcelFile(os.path.join(app.config['UPLOAD_FOLDER'], filename)))[0]
-                keys = dataSorter(ExcelFile(os.path.join(app.config['UPLOAD_FOLDER'], filename)))[1]
-                return redirect(url_for('home', listeFinal=listeFinal, keys=keys, find=[]))
+                return redirect(url_for('home'))
             except:
-                flash('No selected file')
-                return redirect(request.url)
-
-
+                return redirect(url_for('upload_file'))
         if file and allowed_file(file.filename):
-
-            files = glob.glob('static/excel/*')
+            files = glob.glob('/home/SearchMyCartouche/SearchMyCartouche/static/excel/*')
             for f in files: os.remove(f)
-
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
-            listeFinal = dataSorter(ExcelFile(os.path.join(app.config['UPLOAD_FOLDER'], filename)))[0]
-            keys = dataSorter(ExcelFile(os.path.join(app.config['UPLOAD_FOLDER'], filename)))[1]
-
-            return redirect(url_for('home', listeFinal=listeFinal, keys=keys))
+            return redirect(url_for('home'))
     return render_template('upload.html')
 
 

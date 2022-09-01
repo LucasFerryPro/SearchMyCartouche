@@ -70,7 +70,7 @@ def home():
                 inter = listeFinal[index]
                 del listeFinal[index]
                 listeFinal.insert(0,inter)
-        return render_template('home.html', listeFinal=listeFinal, keys=keys, find=find)
+        return render_template('home.html', listeFinal=listeFinal, keys=keys, find=find, test = canHome)
     except:
         return redirect(url_for('upload_file'))
 
